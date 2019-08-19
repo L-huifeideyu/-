@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.SysUserMapper">
+	<select id="findList"
+		resultType="com.example.demo.entity.SysUser"
+		parameterType="com.example.demo.entity.SysUser">
+		SELECT
+		username,
+		password,
+		create_date,
+		update_date,
+		create_by,
+		update_by,
+		user_role,
+		user_company,
+		user_department,
+		user_photo,
+		user_remarks,
+		user_email,
+		name,
+		user_phone
+		FROM sys_user
+		<where>
+			<if test="name != null and name != ''">
+				and name = #{name}
+			</if>
+			<if test="user_role != null and user_role != ''">
+				and user_role = #{user_role}
+			</if>
+		</where>
+	</select>
+
+
+</mapper>
