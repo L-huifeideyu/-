@@ -10,4 +10,6 @@ import com.example.demo.entity.SysUser;
 public interface SysUserMapper {
 	//获取用户数据列表
 	public List<SysUser> findList(SysUser sysUser);
+	//返回用户列表总数
+	public int userCount();
 }

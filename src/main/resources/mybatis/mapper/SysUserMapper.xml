@@ -28,6 +28,10 @@
 				and user_role = #{user_role}
 			</if>
 		</where>
+		LIMIT #{currentIndex},#{pageSize}
+	</select>
+	<select id="userCount" resultType="int">
+		SELECT COUNT(user_id) FROM sys_user
 	</select>
 
 

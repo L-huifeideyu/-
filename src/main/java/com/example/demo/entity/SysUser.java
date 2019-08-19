@@ -14,10 +14,24 @@ public class SysUser {
 	private String user_company;
 	private String user_department;
 	private String user_photo;
+	public int getCurrentIndex() {
+		return currentIndex;
+	}
+	public void setCurrentIndex(int currentIndex) {
+		this.currentIndex = currentIndex;
+	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
 	private String user_remarks;
 	private String user_email;
 	private String name;
 	private String user_phone;
+	private int currentIndex;
+	private int pageSize;
 	public String getUser_id() {
 		return user_id;
 	}

@@ -20,4 +20,10 @@ public class SysUserService {
 	public List<SysUser> findList(SysUser sysUser){
 		return sysUserMapper.findList(sysUser);
 	}
+	/**
+	 * 获取用户总数
+	 * */
+	public int userCount() {
+		return sysUserMapper.userCount();
+	}
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.PageList;
 import com.example.demo.entity.ResultData;
 import com.example.demo.entity.SysUser;
 import com.example.demo.service.SysUserService;
@@ -21,14 +22,17 @@ public class SysUserController {
 
 	// 获取用户数据列表
 	@GetMapping("/userList")
-	public ResultData GetUser(SysUser sysUser, String currentIndex, String pageSize) {
-
+	public ResultData GetUser(SysUser sysUser) {
 		ResultData resultData = new ResultData();
+		int currentIndex = sysUser.getCurrentIndex();
+		sysUser.setCurrentIndex(currentIndex-1);
 		List<SysUser> userList = userService.findList(sysUser);
-		
-		int fromIndex = Integer.parseInt(currentIndex);
-		int endIndex = Integer.parseInt(pageSize);
-		List<SysUser> pageList = userList.subList((fromIndex-1)*endIndex, fromIndex*endIndex);
+		int total = userService.userCount();
+		PageList pageList = new PageList();
+		pageList.setTotal(total);
+		pageList.setList(userList);
+		pageList.setCurrentIndex(sysUser.getCurrentIndex());
+		pageList.setPageSize(sysUser.getPageSize());
 		resultData.setStatus("100");
 		resultData.setData(pageList);
 		resultData.setMsg("ok");

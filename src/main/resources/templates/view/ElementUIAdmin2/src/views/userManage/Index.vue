@@ -20,27 +20,27 @@
         ref="table"
         style="width: 100%">
       <el-table-column
-          prop="loginname"
+          prop="username"
           label="登录账号">
       </el-table-column>
       <el-table-column
-          prop="nickname"
-          label="昵称">
+          prop="name"
+          label="真实姓名">
       </el-table-column>
       <el-table-column
-          prop="email"
+          prop="user_email"
           label="邮箱">
       </el-table-column>
       <el-table-column
-          prop="cellphone"
+          prop="user_phone"
           label="手机">
       </el-table-column>
       <el-table-column
-          prop="result"
-          label="用户体质">
-        <div slot-scope="scope" style="width: 100%;text-align: center">{{ scope.row.result ?
+          prop="user_role"
+          label="用户角色">
+        <!--<div slot-scope="scope" style="width: 100%;text-align: center">{{ scope.row.result ?
           $Config.tizhiCategories[scope.row.result]:'未判定' }}
-        </div>
+        </div>-->
       </el-table-column>
       <el-table-column
           prop="sex"
@@ -49,100 +49,79 @@
         <div slot-scope="scope" style="width: 100%;text-align: center">{{ $Config.sex[scope.row.sex] }}</div>
       </el-table-column>
       <el-table-column
-          prop="active"
-          width="100"
-          label="是否激活">
-        <div slot-scope="scope" style="width: 100%;text-align: center">
-          <el-tag v-if="scope.row.active">正常</el-tag>
-          <el-tag v-else type="danger">被删除</el-tag>
-        </div>
-      </el-table-column>
-      <el-table-column
           label="操作"
           :render-header="tableAction"
           width="180">
         <template slot-scope="scope">
-            <el-button @click="resetting(scope.row.id)" type="warning" style="transition: .4s;"  :ref="scope.row.id"  icon="el-icon-refresh" size="small" circle></el-button>
-            <el-button @click="editUser(scope.row)" type="primary" icon="el-icon-edit" size="small" circle></el-button>
-            <el-button @click="deleteUser(scope.row.id)" v-if="scope.row.active != '0'" type="danger" icon="el-icon-delete" circle size="small"></el-button>
-            <el-button @click="deleteUser(scope.row.id)" v-else icon="el-icon-check" circle size="small"></el-button>
+            <el-button type="success" icon="el-icon-zoom-in" size="mini" circle="true"></el-button>
+            <el-button type="warning" icon="el-icon-edit" size="mini" circle="true"></el-button>
+            <el-button type="danger" icon="el-icon-error" size="mini" circle="true"></el-button>
         </template>
       </el-table-column>
     </el-table>
+      <div>
+          <el-pagination
+                  background="true"
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page="currentIndex"
+                  :page-sizes="[10, 20, 30, 40]"
+                  :page-size=pageSize
+                  layout=" prev, pager, next,sizes,total"
+                  :total=total>
+          </el-pagination>
+      </div>
   </div>
 </template>
 
 <script>
   import ToolBar from '@/components/ToolBar.vue';
   import HelpHint from '@/components/HelpHint.vue';
-  import {test} from '@/api/demo.js';
+  import {getUserList} from '@/api/sys.js';
   export default {
     data() {
       return {
         params: {
           name: '',
         },
-        usersData: [
-          {id:1,loginname:'Admin',nickname:'管理员',email:'Admin@.admin.com',cellphone:'151178xxxx',sex:'male',active:1},
-          {id:2,loginname:'SenLin',nickname:'森林',email:'SenLin@.admin.com',cellphone:'151178xxxx',sex:'unknown',active:0},
-          {id:4,loginname:'Admin1',nickname:'赵晓',email:'Admin@.admin.com',cellphone:'151178xxxx',sex:'male',active:1},
-          {id:5,loginname:'Wujun',nickname:'吴军',email:'Admin@.admin.com',cellphone:'151178xxxx',sex:'male',active:1},
-          {id:5,loginname:'Huang',nickname:'黄家',email:'Admin@.admin.com',cellphone:'151178xxxx',sex:'male',active:1},
-        ]
+        usersData: [],
+          currentIndex:1,
+          pageSize:10,
+          name:"",
+          user_role:"",
+          total:""
       }
     },
     methods: {
-      searchUser(){
-        let tableRow = this.$refs.table.$el.querySelectorAll('tbody tr');
-        let tableRowHeight = tableRow[1].offsetHeight;
-        let isjump = false;
-        for (let i = 0;i < this.usersData.length; i ++){
-          if(this.params.name && this.usersData[i].nickname.indexOf(this.params.name) != -1){
-            tableRow[i].style.backgroundColor = '#85ce61';
-            if(! isjump){
-              scrollTo(0,i*tableRowHeight + 66 );isjump = true;
-            }
-          }else {
-            tableRow[i].style.backgroundColor = '#fff';
+        handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+        },
+        handleCurrentChange(val) {
+            console.log(`当前页: ${val}`);
+        },
+        getUserList(){
+          let data = {
+              currentIndex: this.currentIndex,
+              pageSize: this.pageSize,
+              name:this.name,
+              user_role: this.user_role
           }
-        }
-      },
-      tableAction(){
-        return this.$createElement('HelpHint',{
-            props:{
-              content:'重置密码为123456 / 编辑用户 / 删除或恢复用户'
-            }
-          },'操作');
-      },
-      editUser(data) {
+          getUserList(data).then(result => {
+              if(result.status == "100"){
+                  let { list,total} = result.data
+                  this.usersData = list
+                  this.total = total
 
-      },
-      UploadUser(data) {
+              }else{
+                  this.$message.warning(result.msg)
+              }
+          })
+        },
 
-      },
-      deleteUser(id) {
-
-          this.$message({
-            message: '这里请求api删除或者恢复用户之后刷新分页组件，列表自动更新',
-            type: 'success'
-          });
-
-      },
-      resetting(id) {
-
-      let dom = this.$refs[id].$el;
-      dom.style.transform = 'rotate(180deg)';
-      setTimeout(()=>{dom.style.transform = 'rotate(0deg)'},600)
-      this.$message({
-        message: '已经成功重置密码',
-        type: 'success'
-      });
-
-      },
 
     },
     mounted(){
-
+        this.getUserList()
     },
     components: {
       ToolBar,HelpHint
